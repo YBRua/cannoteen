@@ -16,8 +16,8 @@
   .btn-black {
     @apply rounded-md;
     @apply text-white hover:text-black;
-    @apply bg-black hover:bg-white;
-    @apply ring ring-white;
+    @apply bg-black hover:bg-gray-200 hover:border-transparent;
+    @apply border-2 border-gray-200;
     @apply ease-in-out duration-200;
   }
 
@@ -40,7 +40,8 @@
   }
 
   .btn-canteen {
-    @apply pl-2 pr-2 pt-1 pb-1;
+    @apply pl-1 pr-1 pt-1 pb-1;
+    @apply sm:pl-2 sm:pr-2;
 
     @apply font-semibold;
     @apply text-gray-600;
