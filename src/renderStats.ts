@@ -74,39 +74,41 @@ function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
   };
 }
 
-await fetch(CANTEEN_URL)
-  .then((res) => res.json())
-  .then(function (results) {
-    for (const res of results) {
-      let resObj = parseMetaStat(res);
-      if (!resObj.name.includes("闵行")) {
-        continue;
+async function justRush() {
+  await fetch(CANTEEN_URL)
+    .then((res) => res.json())
+    .then(function (results) {
+      for (const res of results) {
+        let resObj = parseMetaStat(res);
+        if (!resObj.name.includes("闵行")) {
+          continue;
+        }
+        metaStats.push(resObj);
       }
-      metaStats.push(resObj);
+      console.log("Fetched meta data.");
+      metaStats.sort((a, b) => a.id - b.id);
+    });
+
+  const canteenSelector =
+    document.querySelector<HTMLDivElement>("#canteen-selector")!;
+
+  console.log("Entering For Loop");
+  for (let i = 0; i < metaStats.length; ++i) {
+    const metaStat = metaStats[i];
+
+    const abbr = name2abbr.get(metaStat.name)!;
+    const canteenBtn = document.createElement("button");
+    console.log(`Created ${abbr}`);
+    canteenBtn.classList.add("btn-canteen");
+    canteenBtn.id = `canteen-selector-${metaStat.id}`;
+    if (i == selectedId) {
+      canteenBtn.classList.add("btn-canteen-selected");
+      selectedMeta = metaStat;
     }
-    console.log("Fetched meta data.");
-    metaStats.sort((a, b) => a.id - b.id);
-  });
-
-const canteenSelector =
-  document.querySelector<HTMLDivElement>("#canteen-selector")!;
-
-console.log("Entering For Loop");
-for (let i = 0; i < metaStats.length; ++i) {
-  const metaStat = metaStats[i];
-
-  const abbr = name2abbr.get(metaStat.name)!;
-  const canteenBtn = document.createElement("button");
-  console.log(`Created ${abbr}`);
-  canteenBtn.classList.add("btn-canteen");
-  canteenBtn.id = `canteen-selector-${metaStat.id}`;
-  if (i == selectedId) {
-    canteenBtn.classList.add("btn-canteen-selected");
-    selectedMeta = metaStat;
+    canteenBtn.innerText = abbr;
+    canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
+    canteenSelector.appendChild(canteenBtn);
   }
-  canteenBtn.innerText = abbr;
-  canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
-  canteenSelector.appendChild(canteenBtn);
 }
 
-export {};
+justRush();
