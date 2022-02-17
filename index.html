@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/css/style.css" />
+    <title>睿宝今天吃什么</title>
+  </head>
+  <body class="bg-zinc-800">
+    <div id="main-framework" class="container w-5/6">
+      <div
+        id="control-panel-row"
+        class="container mt-4 shadow-xl sm:flex sm:flex-row"
+      >
+        <div id="button-panel" class="h-85vh-sm95 bg-black sm:w-1/2">
+          <div id="brand" class="container pt-16 sm:pt-24 pb-16">
+            <h1 id="title" class="text-4xl text-center text-white">
+              睿宝今天吃什么
+            </h1>
+          </div>
+          <div
+            id="buttons-container"
+            class="grid gap-8 place-items-center pt-8 pb-16"
+          >
+            <button
+              id="btn-just-eat"
+              class="text-xl pl-16 pr-16 pt-2 pb-2 btn-black"
+            >
+              恰饭
+            </button>
+            <a id="btn-info" class="text-xl pl-16 pr-16 pt-2 pb-2 btn-black">
+              信息
+            </a>
+            <a id="btn-config" class="text-xl pl-16 pr-16 pt-2 pb-2 btn-black">
+              设置
+            </a>
+          </div>
+        </div>
+
+        <div
+          id="stats-panel"
+          class="flex flex-col place-items-center h-85vh-sm95 bg-white sm:w-1/2"
+        >
+          <div id="stats-header" class="pt-16 sm:pt-24 pb-8">
+            <h2 id="stats-title" class="text-4xl text-center text-black">
+              Can'teen
+            </h2>
+          </div>
+          <div id="canteen-selector" class="flex"></div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="modal"
+      class="hidden"
+    >
+      <div
+        id="modal-content"
+        class="bg-white w-10/12 max-w-sm h-96 drop-shadow-md rounded-md"
+      >
+        <div id="modal-header" class="flex gap-4 mt-4 ml-4 mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            aria-hidden="true"
+            role="img"
+            class="iconify iconify--mdi"
+            width="32"
+            height="32"
+            preserveAspectRatio="xMidYMid meet"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="#000000"
+              d="m20.8 22.7l-5.1-5.1c-.6.7-1.1 1.3-1.6 1.7c-.8.7-1.4.7-2.1.7l.8-3c-3.3-.2-6.2-1.6-7-3.4c-.1.5-.2.9-.4 1.2C4.7 16 3.3 16 2 16c1.1 0 1.5-1.6 1.5-3.5S3.1 9 2 9c1.3 0 2.7 0 3.3 1.2c.2.3.3.8.4 1.2c.3-.7 1-1.4 1.9-1.9L1.1 3l1.3-1.3l19.7 19.7l-1.3 1.3M9.8 6.6L9 5c2 0 4 0 5.3.7c1.1.6 1.8 1.6 2.4 2.7c2.9.7 5.3 2.3 5.3 4.1c0 1.3-1.2 2.5-3 3.3L9.8 6.6M16 12c0 .6.4 1 1 1s1-.4 1-1s-.4-1-1-1s-1 .4-1 1Z"
+            ></path>
+          </svg>
+          <h2 id="modal-header" class="text-2xl">UntouchedFishError</h2>
+        </div>
+        <div id="modal-detail" class="grid mt-16 mb-4 place-items-center">
+          <div class="mt-10 mb-1 text-center text-black text-xl">
+            页面建设中
+          </div>
+          <div class="mt-1 text-center text-gray-500">
+            This fish is still being touched.
+          </div>
+        </div>
+        <div id="modal-btns" class="flex justify-end gap-4 mt-24 mr-4">
+          <button
+            id="modal-btn-okay"
+            class="btn-green pl-8 pr-8 pt-1 pb-1 font-semibold"
+          >
+            好的
+          </button>
+          <button id="modal-btn-alsookay" class="btn-red pl-8 pr-8 pt-1 pb-1">
+            好的吧
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module" src="./src/index.ts"></script>
+</html>
