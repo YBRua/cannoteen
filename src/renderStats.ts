@@ -8,7 +8,7 @@ interface CanteenStat {
   occupied: number;
 }
 
-function initName2AbbrMapping() {
+function _initName2AbbrMapping() {
   const names: Array<string> = [
     "闵行第一餐厅",
     "闵行第二餐厅",
@@ -40,7 +40,7 @@ function initName2AbbrMapping() {
   return name2Abbr;
 }
 
-function parseMetaStat(input: any): CanteenStat {
+function _parseMetaStat(input: any): CanteenStat {
   let res = {} as CanteenStat;
   res.id = input["Id"];
   res.name = input["Name"];
@@ -54,13 +54,13 @@ function parseMetaStat(input: any): CanteenStat {
 const CANTEEN_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/Place";
 const DETAIL_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/PlaceDetails/";
 
-const name2abbr = initName2AbbrMapping();
+const name2abbr = _initName2AbbrMapping();
 const metaStats: Array<CanteenStat> = [];
 
 let selectedId = 0;
 let selectedMeta: CanteenStat;
 
-function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
+function _canteenSelectorOnClickGenerator(metaId: number, elId: string) {
   elId = "#" + elId;
   return async function () {
     const currentSelected = document.querySelector<HTMLButtonElement>(
@@ -74,11 +74,11 @@ function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
 
     selectedId = metaId;
     selectedMeta = metaStats[metaId];
-    await renderCanteenDetails(metaId);
+    await _renderCanteenDetails(metaId);
   };
 }
 
-async function renderCanteenSelectors() {
+async function _renderCanteenSelectors() {
   const canteenSelector =
     document.querySelector<HTMLDivElement>("#canteen-selector")!;
 
@@ -98,12 +98,12 @@ async function renderCanteenSelectors() {
     }
 
     canteenBtn.innerText = abbr;
-    canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
+    canteenBtn.onclick = _canteenSelectorOnClickGenerator(i, canteenBtn.id);
     canteenSelector.appendChild(canteenBtn);
   }
 
   canteenSelector.classList.remove("conceal");
-  await renderCanteenDetails(selectedId);
+  await _renderCanteenDetails(selectedId);
 }
 
 function _getPieColor(value: number): string {
@@ -116,14 +116,14 @@ function _getPieColor(value: number): string {
   return "#f87171"; // red-400
 }
 
-function createCanvas() {
+function _createCanvas() {
   const canvas = document.createElement("div");
   canvas.id = "occupation-rate-canvas";
 
   return canvas;
 }
 
-function createDetailCardStats(result: CanteenStat) {
+function _createDetailCardStats(result: CanteenStat) {
   const detailCardContainer = document.createElement("div");
   detailCardContainer.id = "detail-card-container";
 
@@ -165,7 +165,7 @@ function createDetailCardStats(result: CanteenStat) {
   return detailCardContainer;
 }
 
-function renderCanvas(canvas: HTMLDivElement, result: CanteenStat) {
+function _renderCanvas(canvas: HTMLDivElement, result: CanteenStat) {
   const chart = echarts.init(canvas);
   console.log(result.name);
 
@@ -206,11 +206,11 @@ function renderCanvas(canvas: HTMLDivElement, result: CanteenStat) {
   option && chart.setOption(option);
 }
 
-function createDetailCard(result: CanteenStat) {
+function _createDetailCard(result: CanteenStat) {
   const detailCard = document.createElement("div");
   detailCard.id = "detail-card";
-  const detailCardContainer = createDetailCardStats(result);
-  const canvas = createCanvas();
+  const detailCardContainer = _createDetailCardStats(result);
+  const canvas = _createCanvas();
 
   detailCard.appendChild(detailCardContainer);
   detailCard.appendChild(canvas);
@@ -218,14 +218,14 @@ function createDetailCard(result: CanteenStat) {
   return { canvas: canvas, detailCard: detailCard };
 }
 
-async function renderCanteenDetails(metaId: number) {
+async function _renderCanteenDetails(metaId: number) {
   const metaStat = metaStats[metaId];
   await fetch(DETAIL_URL + metaStat.id)
     .then((res) => res.json())
     .then(function (results) {
       const details: Array<CanteenStat> = [];
       for (const result of results) {
-        details.push(parseMetaStat(result));
+        details.push(_parseMetaStat(result));
       }
       details.sort((a, b) => a.id - b.id);
 
@@ -235,10 +235,10 @@ async function renderCanteenDetails(metaId: number) {
       detailCardContainer.innerHTML = "";
       for (const detail of details) {
         const { canvas: canvas, detailCard: detailCard } =
-          createDetailCard(detail);
+          _createDetailCard(detail);
         detailCardContainer.append(detailCard);
 
-        renderCanvas(canvas, detail);
+        _renderCanvas(canvas, detail);
       }
     });
 }
@@ -248,7 +248,7 @@ async function justRush() {
     .then((res) => res.json())
     .then(function (results) {
       for (const res of results) {
-        let resObj = parseMetaStat(res);
+        let resObj = _parseMetaStat(res);
         if (!resObj.name.includes("闵行")) {
           continue;
         }
@@ -258,7 +258,7 @@ async function justRush() {
       metaStats.sort((a, b) => a.id - b.id);
     });
 
-  await renderCanteenSelectors();
+  await _renderCanteenSelectors();
 }
 
 justRush();
