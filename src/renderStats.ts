@@ -50,6 +50,7 @@ function parseMetaStat(input: any): MetaStat {
 }
 
 const CANTEEN_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/Place";
+const DETAIL_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/PlaceDetails/";
 
 const name2abbr = initName2AbbrMapping();
 const metaStats: Array<MetaStat> = [];
@@ -59,7 +60,7 @@ let selectedMeta: MetaStat;
 
 function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
   elId = "#" + elId;
-  return function () {
+  return async function () {
     const currentSelected = document.querySelector<HTMLButtonElement>(
       `#canteen-selector-${selectedMeta.id}`
     )!;
@@ -71,7 +72,45 @@ function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
 
     selectedId = metaId;
     selectedMeta = metaStats[metaId];
+    await renderCanteenDetails(metaId);
   };
+}
+
+async function renderCanteenSelectors() {
+  const canteenSelector =
+    document.querySelector<HTMLDivElement>("#canteen-selector")!;
+
+  for (let i = 0; i < metaStats.length; ++i) {
+    const metaStat = metaStats[i];
+
+    const abbr = name2abbr.get(metaStat.name)!;
+
+    const canteenBtn = document.createElement("li");
+    console.log(`Created ${abbr}`);
+    canteenBtn.classList.add("btn-canteen");
+    canteenBtn.id = `canteen-selector-${metaStat.id}`;
+
+    if (i == selectedId) {
+      canteenBtn.classList.add("btn-canteen-selected");
+      selectedMeta = metaStat;
+    }
+
+    canteenBtn.innerText = abbr;
+    canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
+    canteenSelector.appendChild(canteenBtn);
+  }
+
+  canteenSelector.classList.remove("conceal");
+  await renderCanteenDetails(selectedId);
+}
+
+async function renderCanteenDetails(metaId: number) {
+  const metaStat = metaStats[metaId];
+  await fetch(DETAIL_URL + metaStat.id)
+    .then((res) => res.json())
+    .then(function (results) {
+      console.log(results);
+    });
 }
 
 async function justRush() {
@@ -87,33 +126,9 @@ async function justRush() {
       }
       console.log("Fetched meta data.");
       metaStats.sort((a, b) => a.id - b.id);
-
-      const canteenSelector = document.querySelector<HTMLDivElement>(
-        "#canteen-selector"
-      )!;
-
-      for (let i = 0; i < metaStats.length; ++i) {
-        const metaStat = metaStats[i];
-
-        const abbr = name2abbr.get(metaStat.name)!;
-
-        const canteenBtn = document.createElement("li");
-        console.log(`Created ${abbr}`);
-        canteenBtn.classList.add("btn-canteen");
-        canteenBtn.id = `canteen-selector-${metaStat.id}`;
-
-        if (i == selectedId) {
-          canteenBtn.classList.add("btn-canteen-selected");
-          selectedMeta = metaStat;
-        }
-
-        canteenBtn.innerText = abbr;
-        canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
-        canteenSelector.appendChild(canteenBtn);
-      }
-
-      canteenSelector.classList.remove('hidden');
     });
+    
+  await renderCanteenSelectors();
 }
 
 justRush();

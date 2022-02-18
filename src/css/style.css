@@ -68,6 +68,12 @@
 
 #canteen-selector {
   display: flex;
+  transition: 0.5s;
+}
+
+#canteen-selector.conceal {
+  visibility: hidden;
+  opacity: 0;
 }
 
 #modal.hidden {
