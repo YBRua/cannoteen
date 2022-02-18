@@ -1,4 +1,6 @@
-interface MetaStat {
+import * as echarts from "echarts";
+
+interface CanteenStat {
   id: number;
   name: string;
   total: number;
@@ -38,8 +40,8 @@ function initName2AbbrMapping() {
   return name2Abbr;
 }
 
-function parseMetaStat(input: any): MetaStat {
-  let res = {} as MetaStat;
+function parseMetaStat(input: any): CanteenStat {
+  let res = {} as CanteenStat;
   res.id = input["Id"];
   res.name = input["Name"];
   res.total = input["Seat_s"];
@@ -53,10 +55,10 @@ const CANTEEN_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/Place";
 const DETAIL_URL = "https://canteen.sjtu.edu.cn/CARD/Ajax/PlaceDetails/";
 
 const name2abbr = initName2AbbrMapping();
-const metaStats: Array<MetaStat> = [];
+const metaStats: Array<CanteenStat> = [];
 
 let selectedId = 0;
-let selectedMeta: MetaStat;
+let selectedMeta: CanteenStat;
 
 function canteenSelectorOnClickGenerator(metaId: number, elId: string) {
   elId = "#" + elId;
@@ -104,12 +106,69 @@ async function renderCanteenSelectors() {
   await renderCanteenDetails(selectedId);
 }
 
+function _getPieColor(value: number): string {
+  if (value < 60) {
+    return "#4ade80"; // green-400
+  }
+  if (value < 85) {
+    return "#facc15"; // yellow-400
+  }
+  return "#f87171"; // red-400
+}
+
+function renderDetailCard(result: CanteenStat) {
+  const chartCanvas = document.getElementById("test")!;
+  const chart = echarts.init(chartCanvas);
+  console.log(result.name);
+
+  let occupationRate = (result.occupied / result.total) * 100;
+  occupationRate = occupationRate > 100 ? 100 : occupationRate;
+
+  let pieColor = _getPieColor(occupationRate);
+
+  let option: echarts.EChartsOption = {
+    color: [pieColor, "#fff"],
+    series: [
+      {
+        name: result.name,
+        type: "pie",
+        radius: ["50%", "80%"],
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: "#fff",
+          borderWidth: 1,
+        },
+        avoidLabelOverlap: false,
+        labelLine: {
+          show: false,
+        },
+        label: {
+          show: true,
+          position: "center",
+          fontSize: 24,
+          fontFamily: "Georgia",
+          formatter: () => {
+            return occupationRate.toFixed(0);
+          },
+        },
+        data: [{ value: result.occupied }, { value: result.available }],
+      },
+    ],
+  };
+  option && chart.setOption(option);
+}
+
 async function renderCanteenDetails(metaId: number) {
   const metaStat = metaStats[metaId];
   await fetch(DETAIL_URL + metaStat.id)
     .then((res) => res.json())
     .then(function (results) {
-      console.log(results);
+      for (const result of results) {
+        const detailStats = parseMetaStat(result);
+        // console.log(detailStats);
+        renderDetailCard(detailStats);
+        break;
+      }
     });
 }
 
@@ -127,7 +186,7 @@ async function justRush() {
       console.log("Fetched meta data.");
       metaStats.sort((a, b) => a.id - b.id);
     });
-    
+
   await renderCanteenSelectors();
 }
 
