@@ -8,30 +8,43 @@ interface CanteenStat {
   occupied: number;
 }
 
-function _initName2AbbrMapping() {
-  const names: Array<string> = [
-    "闵行第一餐厅",
-    "闵行第二餐厅",
-    "闵行第三餐厅",
-    "闵行第四餐厅",
-    "闵行第五餐厅",
-    "闵行第六餐厅",
-    "闵行第七餐厅",
-    "闵行哈乐餐厅",
-    "闵行玉兰苑",
-  ];
-  const abbrs: Array<string> = [
-    "壹",
-    "贰",
-    "叁",
-    "肆",
-    "伍",
-    "陆",
-    "柒",
-    "哈",
-    "玉",
-  ];
+const names: Array<string> = [
+  "闵行第一餐厅",
+  "闵行第二餐厅",
+  "闵行第三餐厅",
+  "闵行第四餐厅",
+  "闵行第五餐厅",
+  "闵行第六餐厅",
+  "闵行第七餐厅",
+  "闵行哈乐餐厅",
+  "闵行玉兰苑",
+];
 
+const abbrs: Array<string> = [
+  "壹",
+  "贰",
+  "叁",
+  "肆",
+  "伍",
+  "陆",
+  "柒",
+  "哈",
+  "玉",
+];
+
+const fullNames: Array<string> = [
+  "一餐",
+  "二餐",
+  "三餐",
+  "四餐",
+  "五餐",
+  "六餐",
+  "七餐",
+  "哈乐",
+  "玉兰苑"
+]
+
+function _initName2AbbrMapping() {
   const name2Abbr = new Map<string, string>();
   for (let id = 0; id < names.length; ++id) {
     name2Abbr.set(names[id], abbrs[id]);
@@ -60,25 +73,27 @@ const metaStats: Array<CanteenStat> = [];
 let selectedId = 0;
 let selectedMeta: CanteenStat;
 
-function _canteenSelectorOnClickGenerator(metaId: number, elId: string) {
-  elId = "#" + elId;
+function _canteenSelectorOnClickGenerator(metaIndex: number, elementId: string) {
+  elementId = "#" + elementId;
   return async function () {
     const currentSelected = document.querySelector<HTMLButtonElement>(
       `#canteen-selector-${selectedMeta.id}`
     )!;
 
     currentSelected.classList.remove("btn-canteen-selected");
+    currentSelected.innerHTML = name2abbr.get(selectedMeta.name)!;
 
-    const newSelected = document.querySelector<HTMLButtonElement>(elId)!;
+    const newSelected = document.querySelector<HTMLButtonElement>(elementId)!;
     newSelected.classList.add("btn-canteen-selected");
+    newSelected.innerHTML = fullNames[metaIndex];
 
-    selectedId = metaId;
-    selectedMeta = metaStats[metaId];
-    await _renderCanteenDetails(metaId);
+    selectedId = metaIndex;
+    selectedMeta = metaStats[metaIndex];
+    await _renderCanteenDetails(metaIndex);
   };
 }
 
-async function _renderCanteenSelectors() {
+function _renderSelectors() {
   const canteenSelector =
     document.querySelector<HTMLDivElement>("#canteen-selector")!;
 
@@ -88,21 +103,26 @@ async function _renderCanteenSelectors() {
     const abbr = name2abbr.get(metaStat.name)!;
 
     const canteenBtn = document.createElement("li");
-    console.log(`Created ${abbr}`);
+    // console.log(`Created ${abbr}`);
     canteenBtn.classList.add("btn-canteen");
     canteenBtn.id = `canteen-selector-${metaStat.id}`;
 
     if (i == selectedId) {
       canteenBtn.classList.add("btn-canteen-selected");
       selectedMeta = metaStat;
+      canteenBtn.innerHTML = fullNames[i];
+    } else {
+      canteenBtn.innerHTML = abbr;
     }
-
-    canteenBtn.innerText = abbr;
     canteenBtn.onclick = _canteenSelectorOnClickGenerator(i, canteenBtn.id);
     canteenSelector.appendChild(canteenBtn);
   }
 
   canteenSelector.classList.remove("conceal");
+}
+
+async function _render() {
+  _renderSelectors();
   await _renderCanteenDetails(selectedId);
 }
 
@@ -146,7 +166,7 @@ function _createDetailCardStats(result: CanteenStat) {
     statNum.id = "stat-num";
 
     if (statKey == "stat-empty") {
-      statDesc.innerHTML = "空";
+      statDesc.innerHTML = "余";
       statNum.innerHTML =
         result.available < 0 ? "0" : result.available.toString();
     } else {
@@ -258,7 +278,7 @@ async function justRush() {
       metaStats.sort((a, b) => a.id - b.id);
     });
 
-  await _renderCanteenSelectors();
+  await _render();
 }
 
 justRush();
