@@ -48,6 +48,8 @@
     @apply border-2 border-gray-200;
     @apply hover:text-white hover:bg-gray-600 hover:border-transparent;
     @apply ease-in-out duration-200;
+    
+    cursor: pointer;
   }
 
   .btn-canteen-selected {
@@ -62,6 +64,10 @@
     @apply top-0 left-0 w-screen h-screen fixed;
     @apply z-50;
   }
+}
+
+#canteen-selector {
+  display: flex;
 }
 
 #modal.hidden {

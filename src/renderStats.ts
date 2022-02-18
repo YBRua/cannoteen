@@ -19,13 +19,13 @@ function initName2AbbrMapping() {
     "闵行玉兰苑",
   ];
   const abbrs: Array<string> = [
-    "一",
-    "二",
-    "三",
-    "四",
-    "五",
-    "六",
-    "七",
+    "壹",
+    "贰",
+    "叁",
+    "肆",
+    "伍",
+    "陆",
+    "柒",
     "哈",
     "玉",
   ];
@@ -87,28 +87,33 @@ async function justRush() {
       }
       console.log("Fetched meta data.");
       metaStats.sort((a, b) => a.id - b.id);
+
+      const canteenSelector = document.querySelector<HTMLDivElement>(
+        "#canteen-selector"
+      )!;
+
+      for (let i = 0; i < metaStats.length; ++i) {
+        const metaStat = metaStats[i];
+
+        const abbr = name2abbr.get(metaStat.name)!;
+
+        const canteenBtn = document.createElement("li");
+        console.log(`Created ${abbr}`);
+        canteenBtn.classList.add("btn-canteen");
+        canteenBtn.id = `canteen-selector-${metaStat.id}`;
+
+        if (i == selectedId) {
+          canteenBtn.classList.add("btn-canteen-selected");
+          selectedMeta = metaStat;
+        }
+
+        canteenBtn.innerText = abbr;
+        canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
+        canteenSelector.appendChild(canteenBtn);
+      }
+
+      canteenSelector.classList.remove('hidden');
     });
-
-  const canteenSelector =
-    document.querySelector<HTMLDivElement>("#canteen-selector")!;
-
-  console.log("Entering For Loop");
-  for (let i = 0; i < metaStats.length; ++i) {
-    const metaStat = metaStats[i];
-
-    const abbr = name2abbr.get(metaStat.name)!;
-    const canteenBtn = document.createElement("button");
-    console.log(`Created ${abbr}`);
-    canteenBtn.classList.add("btn-canteen");
-    canteenBtn.id = `canteen-selector-${metaStat.id}`;
-    if (i == selectedId) {
-      canteenBtn.classList.add("btn-canteen-selected");
-      selectedMeta = metaStat;
-    }
-    canteenBtn.innerText = abbr;
-    canteenBtn.onclick = canteenSelectorOnClickGenerator(i, canteenBtn.id);
-    canteenSelector.appendChild(canteenBtn);
-  }
 }
 
 justRush();
