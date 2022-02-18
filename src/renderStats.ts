@@ -116,9 +116,57 @@ function _getPieColor(value: number): string {
   return "#f87171"; // red-400
 }
 
-function renderDetailCard(result: CanteenStat) {
-  const chartCanvas = document.getElementById("test")!;
-  const chart = echarts.init(chartCanvas);
+function createCanvas() {
+  const canvas = document.createElement("div");
+  canvas.id = "occupation-rate-canvas";
+
+  return canvas;
+}
+
+function createDetailCardStats(result: CanteenStat) {
+  const detailCardContainer = document.createElement("div");
+  detailCardContainer.id = "detail-card-container";
+
+  const statContainer = document.createElement("div");
+  statContainer.id = "stat-container";
+
+  const subcanteenName = document.createElement("h3");
+  subcanteenName.id = "subcanteen-name";
+  subcanteenName.innerHTML = result.name;
+
+  statContainer.appendChild(subcanteenName);
+
+  for (const statKey of ["stat-empty", "stat-occupied"]) {
+    const statEntry = document.createElement("div");
+    statEntry.id = statKey;
+
+    const statDesc = document.createElement("h4");
+    statDesc.id = "stat-desc";
+    const statNum = document.createElement("span");
+    statNum.id = "stat-num";
+
+    if (statKey == "stat-empty") {
+      statDesc.innerHTML = "空";
+      statNum.innerHTML =
+        result.available < 0 ? "0" : result.available.toString();
+    } else {
+      statDesc.innerHTML = "占";
+      statNum.innerHTML =
+        result.occupied > result.total
+          ? result.total.toString()
+          : result.occupied.toString();
+    }
+    statEntry.appendChild(statDesc);
+    statEntry.appendChild(statNum);
+    statContainer.appendChild(statEntry);
+  }
+  detailCardContainer.appendChild(statContainer);
+
+  return detailCardContainer;
+}
+
+function renderCanvas(canvas: HTMLDivElement, result: CanteenStat) {
+  const chart = echarts.init(canvas);
   console.log(result.name);
 
   let occupationRate = (result.occupied / result.total) * 100;
@@ -145,7 +193,7 @@ function renderDetailCard(result: CanteenStat) {
         label: {
           show: true,
           position: "center",
-          fontSize: 24,
+          fontSize: window.innerWidth > 768 ? 24 : 16,
           fontFamily: "Georgia",
           formatter: () => {
             return occupationRate.toFixed(0);
@@ -158,16 +206,39 @@ function renderDetailCard(result: CanteenStat) {
   option && chart.setOption(option);
 }
 
+function createDetailCard(result: CanteenStat) {
+  const detailCard = document.createElement("div");
+  detailCard.id = "detail-card";
+  const detailCardContainer = createDetailCardStats(result);
+  const canvas = createCanvas();
+
+  detailCard.appendChild(detailCardContainer);
+  detailCard.appendChild(canvas);
+
+  return { canvas: canvas, detailCard: detailCard };
+}
+
 async function renderCanteenDetails(metaId: number) {
   const metaStat = metaStats[metaId];
   await fetch(DETAIL_URL + metaStat.id)
     .then((res) => res.json())
     .then(function (results) {
+      const details: Array<CanteenStat> = [];
       for (const result of results) {
-        const detailStats = parseMetaStat(result);
-        // console.log(detailStats);
-        renderDetailCard(detailStats);
-        break;
+        details.push(parseMetaStat(result));
+      }
+      details.sort((a, b) => a.id - b.id);
+
+      const detailCardContainer = document.getElementById(
+        "canteen-detail-container"
+      )!;
+      detailCardContainer.innerHTML = "";
+      for (const detail of details) {
+        const { canvas: canvas, detailCard: detailCard } =
+          createDetailCard(detail);
+        detailCardContainer.append(detailCard);
+
+        renderCanvas(canvas, detail);
       }
     });
 }
