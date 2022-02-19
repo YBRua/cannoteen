@@ -127,10 +127,10 @@ async function _render() {
 }
 
 function _getPieColor(value: number): string {
-  if (value < 60) {
+  if (value < 50) {
     return "#4ade80"; // green-400
   }
-  if (value < 85) {
+  if (value < 80) {
     return "#facc15"; // yellow-400
   }
   return "#f87171"; // red-400
@@ -219,6 +219,7 @@ function _renderCanvas(canvas: HTMLDivElement, result: CanteenStat) {
             return occupationRate.toFixed(0);
           },
         },
+        silent: true,
         data: [{ value: result.occupied }, { value: result.available }],
       },
     ],
